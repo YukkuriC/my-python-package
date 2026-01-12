@@ -1,6 +1,6 @@
 from YukkuriC.minecraft.secret_loader import SECRETS
-from YukkuriC.files.file_loader import opentext
-import requests, json
+from YukkuriC.files.file_loader import opentext, loadjson
+import requests, json, os
 
 
 def pick_versions(
@@ -27,6 +27,10 @@ def pick_versions(
             versionByName[entry['name']] = entry['id']
     if versionByName_io:
         json.dump(versionByName, versionByName_io, indent='\t')
+
+
+def load_curseforge_version_map():
+    return loadjson(os.path.join(__file__, '..', 'versionByName.json'))
 
 
 if __name__ == '__main__':
