@@ -6,6 +6,9 @@ blacklisted_names = ['sources', 'dev', 'all']
 
 
 def do_collect(root, pattern, do_clean=True):
+    if os.path.isfile(root):
+        root = os.path.dirname(root)
+
     if do_clean:
         exist_glob_root = os.path.join(root, os.path.basename(pattern))
         print('Cleaning:', exist_glob_root)
