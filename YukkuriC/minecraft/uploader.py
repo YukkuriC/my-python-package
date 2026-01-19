@@ -13,7 +13,10 @@ def load_cfg_changelog(cfg_path, changelog_path=None):
 
     if changelog_path:
         global CHANGELOG
-        CHANGELOG = loadtext(changelog_path)
+        try:
+            CHANGELOG = loadtext(changelog_path)
+        except:
+            CHANGELOG = ''
 
     if CFG.get('mock'):
 
@@ -40,12 +43,12 @@ def build_pusher(
 ):
     filename_arg_names = filename_contents.split(',')
 
-    dep = [
+    deps = [
         {"project_id": dep, "dependency_type": "required"}
         for dep in CFG['MR']['dependencies']
     ]
     if 'optional' in CFG['MR']:
-        dep += [
+        deps += [
             {"project_id": dep, "dependency_type": "optional"}
             for dep in CFG['MR']["optional"]
         ]
@@ -75,7 +78,7 @@ def build_pusher(
                 "name": filename_body,
                 "version_number": mod_version_full,
                 "changelog": CHANGELOG,
-                "dependencies": dep,
+                "dependencies": deps,
                 "game_versions": [arg_map['game_version']],
                 "version_type": "release",
                 "loaders": [arg_map['platform']],
@@ -140,7 +143,7 @@ def push_all(root, pusher):
 __all__ = [
     'load_cfg_changelog',
     'build_pusher',
-    'push_all'
+    'push_all',
 ]
 
 if __name__ == '__main__':
