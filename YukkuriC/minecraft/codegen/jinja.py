@@ -1,5 +1,6 @@
 import os, yaml
 from jinja2 import Environment, FileSystemLoader
+from YukkuriC.files import wrap_folder
 
 if 'prepare data':
     # type,name,side,category,descrip,default_cfg
@@ -49,9 +50,8 @@ if 'prepare data':
 
 
 def load_env(root, dir='templates'):
-    if os.path.isfile(root):
-        root = os.path.dirname(root)
-    return Environment(loader=FileSystemLoader(os.path.join(root, 'templates')))
+    root = wrap_folder(root)
+    return Environment(loader=FileSystemLoader(os.path.join(root, dir)))
 
 
 def gen_file(env, template, target):
