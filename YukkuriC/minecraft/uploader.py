@@ -8,7 +8,7 @@ CFG = {}
 CHANGELOG = ''
 
 
-def load_cfg_changelog(cfg_path, changelog_path=None):
+def load_cfg_changelog(cfg_path='config.json', changelog_path='changelog.md'):
     global CFG
     CFG = loadjson(cfg_path)
 
