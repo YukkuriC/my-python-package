@@ -2,6 +2,7 @@ from YukkuriC.files.file_loader import loadjson, loadtext
 from YukkuriC.minecraft.secret_loader import SECRETS
 from YukkuriC.minecraft.version_picker import load_curseforge_version_map
 import os, requests, json
+import webbrowser
 
 CFG = {}
 CHANGELOG = ''
@@ -145,8 +146,32 @@ def push_all(root, pusher):
         pusher(sub)
 
 
+def upload_readme(readme_path='../README.md'):
+    readme_path = os.path.abspath(readme_path)
+    print("UPLOADING:", readme_path)
+
+    with open(readme_path, encoding='utf-8') as f:
+        readme = f.read()
+
+    # https://docs.modrinth.com/api/operations/modifyproject/
+    if 'MR' in CFG and not CFG['MR'].get('ignored'):
+        response = requests.patch(
+            f"https://api.modrinth.com/v2/project/{CFG['MR']['project_id']}",
+            json={"body": readme},
+            headers=HEADER_MR,
+        )
+
+        print(response.text, "MR", response.status_code)
+
+    # damn, there's no such API for CF
+    if 'CF' in CFG and not CFG['CF'].get('ignored'):
+        url = f'https://authors.curseforge.com/#/projects/{CFG['CF']['project_id']}/description'
+        webbrowser.open(url)
+
+
 __all__ = [
     'load_cfg_changelog',
     'build_pusher',
     'push_all',
+    'upload_readme',
 ]
