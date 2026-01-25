@@ -20,17 +20,31 @@ def load_cfg_changelog(cfg_path, changelog_path=None):
 
     if CFG.get('mock'):
 
-        def mock_post(*a, **kw):
-            print('POST', a, kw)
-            return mock_post
+        def gen_mock(type):
+            def mocker(*a, **kw):
+                print(type.upper(), a, kw)
+                return mocker
 
-        mock_post.text = 'MOCK'
-        mock_post.status_code = 114514
+            mocker.text = 'MOCK'
+            mocker.status_code = 114514
+            print("MOCKED:", type)
+            return mocker
 
-        requests.post = mock_post
+        for t in 'get', 'post', 'patch':
+            setattr(requests, t, gen_mock(t))
 
 
 curseforge_version_map = load_curseforge_version_map()
+
+
+HEADER_CF = {
+    "X-Api-Token": SECRETS['auth_cf'],
+}
+HEADER_MR = {
+    "Authorization": SECRETS['auth_mr'],
+    "User-Agent": "YukkuriC/mod_uploader_py",
+    # "Content-Type": "multipart/form-data"
+}
 
 
 def build_pusher(
@@ -68,12 +82,7 @@ def build_pusher(
         mod_version_full = mod_version_full_format.format_map(arg_map)
 
         # https://docs.modrinth.com/api/operations/createversion/
-        if not CFG['MR'].get('ignored'):
-            header = {
-                "Authorization": SECRETS['auth_mr'],
-                "User-Agent": f"YukkuriC/{arg_map['mod_name']}",
-                # "Content-Type": "multipart/form-data"
-            }
+        if 'MR' in CFG and not CFG['MR'].get('ignored'):
             data = {
                 "name": filename_body,
                 "version_number": mod_version_full,
@@ -94,13 +103,13 @@ def build_pusher(
                 data={
                     "data": json.dumps(data),
                 },
-                headers=header,
+                headers=HEADER_MR,
                 files={filename: open(file, 'rb')},
             )
             print(response.text, "MR", response.status_code)
 
         # https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api
-        if not CFG['CF'].get('ignored'):
+        if 'CF' in CFG and not CFG['CF'].get('ignored'):
             data = {
                 "changelog": CHANGELOG,
                 "changelogType": "markdown",
@@ -116,16 +125,12 @@ def build_pusher(
                 ],
                 "releaseType": "release",
             }
-            header = {
-                "X-Api-Token": SECRETS['auth_cf'],
-            }
-
             response = requests.post(
                 f"https://minecraft.curseforge.com/api/projects/{CFG['CF']['project_id']}/upload-file",
                 data={
                     "metadata": json.dumps(data),
                 },
-                headers=header,
+                headers=HEADER_CF,
                 files={"file": open(file, 'rb')},
             )
             print(response.text, "CF", response.status_code)
@@ -145,9 +150,3 @@ __all__ = [
     'build_pusher',
     'push_all',
 ]
-
-if __name__ == '__main__':
-    for sub in os.listdir('.'):
-        if not sub.endswith('.jar'):
-            continue
-        push_file(sub)
