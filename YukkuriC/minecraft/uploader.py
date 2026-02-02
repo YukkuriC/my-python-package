@@ -58,15 +58,16 @@ def build_pusher(
 ):
     filename_arg_names = filename_contents.split(',')
 
-    deps = [
-        {"project_id": dep, "dependency_type": "required"}
-        for dep in CFG['MR']['dependencies']
-    ]
-    if 'optional' in CFG['MR']:
-        deps += [
-            {"project_id": dep, "dependency_type": "optional"}
-            for dep in CFG['MR']["optional"]
+    if 'MR' in CFG:
+        deps = [
+            {"project_id": dep, "dependency_type": "required"}
+            for dep in CFG['MR']['dependencies']
         ]
+        if 'optional' in CFG['MR']:
+            deps += [
+                {"project_id": dep, "dependency_type": "optional"}
+                for dep in CFG['MR']["optional"]
+            ]
 
     def push_file(file):
         arg_map = {
