@@ -69,7 +69,7 @@ def build_pusher(
                 for dep in CFG['MR']["optional"]
             ]
 
-    def push_file(file):
+    def push_file(file, side):
         arg_map = {
             'platform': platform,
             'game_version': game_version,
@@ -84,7 +84,7 @@ def build_pusher(
         mod_version_full = mod_version_full_format.format_map(arg_map)
 
         # https://docs.modrinth.com/api/operations/createversion/
-        if 'MR' in CFG and not CFG['MR'].get('ignored'):
+        if side == 'MR' and 'MR' in CFG and not CFG['MR'].get('ignored'):
             data = {
                 "name": filename_body,
                 "version_number": mod_version_full,
@@ -111,7 +111,7 @@ def build_pusher(
             print(response.text, "MR", response.status_code)
 
         # https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api
-        if 'CF' in CFG and not CFG['CF'].get('ignored'):
+        if side == 'CF' and 'CF' in CFG and not CFG['CF'].get('ignored'):
             data = {
                 "changelog": CHANGELOG,
                 "changelogType": "markdown",
@@ -141,10 +141,11 @@ def build_pusher(
 
 
 def push_all(root, pusher):
-    for sub in os.listdir(root):
-        if not sub.endswith('.jar'):
-            continue
-        pusher(sub)
+    targets = [sub for sub in os.listdir(root) if sub.endswith('.jar')]
+    for sub in targets:
+        pusher(sub, 'MR')
+    for sub in targets:
+        pusher(sub, 'CF')
 
 
 def upload_readme(readme_path='../README.md'):
