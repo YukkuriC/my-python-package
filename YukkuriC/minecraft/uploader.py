@@ -166,6 +166,7 @@ def upload_readme(readme_path='../README.md'):
     # damn, there's no such API for CF
     if 'CF' in CFG and not CFG['CF'].get('ignored'):
         url = f'https://authors.curseforge.com/#/projects/{CFG['CF']['project_id']}/description'
+        print(url)
         webbrowser.open(url)
 
 
