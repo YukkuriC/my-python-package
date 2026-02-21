@@ -6,6 +6,10 @@ if 'prepare data':
     # type,name,side,category,descrip,default_cfg
     data = []
 
+    def load_data_raw(raw):
+        global data
+        data = raw
+
     def load_data_yaml(path):
         global data
         with open(path) as f:
@@ -54,15 +58,19 @@ def load_env(root, dir='templates'):
     return Environment(loader=FileSystemLoader(os.path.join(root, dir)))
 
 
-def gen_file(env, template, target):
+def gen_file(env, template, target, render_args=None):
+    if not render_args:
+        render_args = globals()
     print(os.path.relpath(template), '->', os.path.relpath(target))
     with open(os.path.join(target), 'w', encoding='utf-8') as f:
-        print(env.get_template(template).render(**globals()), file=f)
+        print(env.get_template(template).render(**render_args), file=f)
 
 
-def batch_gen(env, targets, ext='.java', root_dir='..'):
+def batch_gen(env, targets, ext='.java', root_dir='..', render_args=None):
     for target in targets:
-        gen_file(env, target + ext, os.path.join('..', targets[target]))
+        gen_file(
+            env, target + ext, os.path.join(root_dir, targets[target]), render_args
+        )
 
 
-__all__ = ['load_data_yaml', 'load_env', 'gen_file', 'batch_gen']
+__all__ = ['load_data_raw', 'load_data_yaml', 'load_env', 'gen_file', 'batch_gen']
