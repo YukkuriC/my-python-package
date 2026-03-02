@@ -2,15 +2,15 @@ import os, glob, shutil
 from functools import partial
 
 
-blacklisted_names = ['sources', 'dev', 'all']
+blacklisted_names = ['sources', 'dev']
 
 
-def do_collect(root, pattern, do_clean=True):
+def do_collect(root, pattern, do_clean=True, pattern_exist=None, renamer=None):
     if os.path.isfile(root):
         root = os.path.dirname(root)
 
     if do_clean:
-        exist_glob_root = os.path.join(root, os.path.basename(pattern))
+        exist_glob_root = pattern_exist or os.path.join(root, os.path.basename(pattern))
         print('Cleaning:', exist_glob_root)
         for path in glob.glob(exist_glob_root):
             print('>', path)
@@ -23,7 +23,10 @@ def do_collect(root, pattern, do_clean=True):
         if any(x in path for x in blacklisted_names):
             continue
         print('>', path)
-        shutil.copy(path, root)
+        if renamer:
+            shutil.copy(path, os.path.join(root, renamer(os.path.basename(path))))
+        else:
+            shutil.copy(path, root)
         res.append(path)
     return res
 
