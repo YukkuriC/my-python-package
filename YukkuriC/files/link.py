@@ -1,8 +1,11 @@
-import os, subprocess
+import os, subprocess, shutil
+from YukkuriC.files import is_junction
 
 
 def link_folder(link: str, src: str, flag='/J'):
-    if not os.path.isdir(src) or os.path.isdir(link):
+    if not is_junction(link):
+        shutil.rmtree(link)
+    if not os.path.isdir(src):
         return
     os.makedirs(os.path.dirname(link), exist_ok=True)
     subprocess.run(
