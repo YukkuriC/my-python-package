@@ -46,6 +46,11 @@ HEADER_MR = {
     "User-Agent": "YukkuriC/mod_uploader_py",
     # "Content-Type": "multipart/form-data"
 }
+CF_PLAY_MAP = {
+    'forge': 7498,
+    'fabric': 7499,
+    'neoforge': 10150,
+}
 
 
 def build_pusher(
@@ -120,9 +125,7 @@ def build_pusher(
                     # client & server
                     *(9638, 9639),
                     8326,  # java 17 TODO java 21
-                    (
-                        7498 if arg_map['platform'] == 'forge' else 7499
-                    ),  # forge or fabric TODO neoforge
+                    CF_PLAY_MAP[arg_map['platform']],  # (neo)forge or fabric
                     curseforge_version_map[arg_map['game_version']],
                 ],
                 "releaseType": "release",
