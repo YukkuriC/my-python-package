@@ -1,4 +1,6 @@
 import os, yaml
+import json
+from functools import partial
 from jinja2 import Environment, FileSystemLoader
 from YukkuriC.files import wrap_folder
 
@@ -55,7 +57,9 @@ if 'prepare data':
 
 def load_env(root, dir='templates'):
     root = wrap_folder(root)
-    return Environment(loader=FileSystemLoader(os.path.join(root, dir)))
+    env = Environment(loader=FileSystemLoader(os.path.join(root, dir)))
+    env.filters['tojson_raw'] = partial(json.dumps, ensure_ascii=0)
+    return env
 
 
 def gen_file(env, template, target, render_args=None):
