@@ -14,7 +14,7 @@ if 'prepare data':
 
     def load_data_yaml(path):
         global data
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             data = yaml.load(f, yaml.Loader)
 
     class _AttrGetter:
