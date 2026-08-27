@@ -96,7 +96,7 @@ def build_pusher(
                 "changelog": CHANGELOG,
                 "dependencies": deps,
                 "game_versions": [arg_map['game_version']],
-                "version_type": "release",
+                "version_type": CFG.get("version_type", "release"),
                 "loaders": [arg_map['platform']],
                 "featured": True,
                 "status": "listed",
@@ -128,7 +128,7 @@ def build_pusher(
                     CF_PLAY_MAP[arg_map['platform']],  # (neo)forge or fabric
                     curseforge_version_map[arg_map['game_version']],
                 ],
-                "releaseType": "release",
+                "releaseType": CFG.get("version_type", "release"),
             }
             response = requests.post(
                 f"https://minecraft.curseforge.com/api/projects/{CFG['CF']['project_id']}/upload-file",
