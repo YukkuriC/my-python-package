@@ -4,7 +4,7 @@ from YukkuriC.files import wrap_folder, is_junction
 
 def do_zip(
     root,
-    blacklist=["DIM1", "DIM-1", "dimensions"],
+    blacklist=['DIM1', 'DIM-1', 'dimensions'],
     target=None,
     axis_range_x=[-1, 0],
     axis_range_y=[-1, 0],
@@ -13,19 +13,19 @@ def do_zip(
     os.chdir(root)
 
     if not target:
-        target = f"PACK_{os.path.basename(os.getcwd())}_{datetime.datetime.now().strftime('%m-%d')}.zip"
+        target = f'PACK_{os.path.basename(os.getcwd())}_{datetime.datetime.now().strftime("%m-%d")}.zip'
 
     try:
         os.remove(target)
     except:
         pass
 
-    pack = zipfile.ZipFile(target, "w")
+    pack = zipfile.ZipFile(target, 'w')
 
     skipped = []
 
-    for f in os.listdir("."):
-        if f.lower().endswith(".zip") or f == 'session.lock':
+    for f in os.listdir('.'):
+        if f.lower().endswith('.zip') or f == 'session.lock':
             continue
         if os.path.isfile(f):
             pack.write(f, f, 0)
@@ -40,9 +40,13 @@ def do_zip(
             if any(root.startswith(black) for black in skipped):
                 print('Skipped (sub):', root)
                 continue
+            is_data = os.path.split(root)[1] == 'data'
             for file in files:
-                if file.startswith("r") and file.endswith(".mca"):
-                    _, x, y, _ = file.split(".")
+                if is_data and not file.endswith('.dat'):
+                    print('Skipped:', file)
+                    continue
+                if file.startswith('r') and file.endswith('.mca'):
+                    _, x, y, _ = file.split('.')
                     x = int(x)
                     y = int(y)
                     if not (x in axis_range_x and y in axis_range_y):
