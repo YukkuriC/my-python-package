@@ -3,7 +3,7 @@ from YukkuriC.files import is_junction
 
 
 def link_folder(link: str, src: str, flag='/J'):
-    if not is_junction(link):
+    if os.path.exists(link) and not is_junction(link):
         shutil.rmtree(link)
     if not os.path.isdir(src):
         return
